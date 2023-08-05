@@ -33,7 +33,7 @@ int Repeating(int arr[], int n) {
         }
     }
 
-    return mostRepeatingElement;
+    return Repeating;
 }
 
 int main() {
@@ -67,7 +67,7 @@ int main() {
 
     // Display the results
     printf("Total number of duplicate elements: %d\n", totalDuplicates);
-    printf("Most repeating element: %d\n", mostRepeatingElement);
+    printf("Most repeating element: %d\n", Repeating);
 
     // Free the allocated memory
     free(arr);
