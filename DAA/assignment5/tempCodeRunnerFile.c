@@ -1,0 +1,2 @@
+
+    struct person temp = *a;
