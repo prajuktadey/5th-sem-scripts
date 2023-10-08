@@ -1,181 +1,216 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-// Define the struct person
-struct person {
+char line[1000];
+struct person
+{
     int id;
-    char *name;
+    char name[20];
     int age;
     int height;
     int weight;
 };
 
-// Function to swap two persons
-void swap(struct person *a, struct person *b) {
-    struct person temp = *a;
-    *a = *b;
-    *b = temp;
-}
+int main()
+{
 
-// Function to heapify a min-heap
-void minHeapify(struct person arr[], int n, int i) {
-    int smallest = i;
-    int left = 2 * i + 1;
-    int right = 2 * i + 2;
-
-    if (left < n && arr[left].age < arr[smallest].age)
-        smallest = left;
-
-    if (right < n && arr[right].age < arr[smallest].age)
-        smallest = right;
-
-    if (smallest != i) {
-        swap(&arr[i], &arr[smallest]);
-        minHeapify(arr, n, smallest);
-    }
-}
-
-// Function to build a min-heap
-void buildMinHeap(struct person arr[], int n) {
-    for (int i = n / 2 - 1; i >= 0; i--)
-        minHeapify(arr, n, i);
-}
-
-// Function to display the weight of the youngest person
-void displayYoungestWeight(struct person arr[], int n) {
-    if (n == 0) {
-        printf("Heap is empty.\n");
-        return;
-    }
-    printf("Weight of youngest student: %.2f kg\n", arr[0].weight / 2.20462); // Convert pounds to kilograms
-}
-
-// Function to insert a new person into the min-heap
-void insertIntoMinHeap(struct person arr[], int *n, struct person newPerson) {
-    (*n)++;
-    int i = *n - 1;
-    arr[i] = newPerson;
-
-    while (i > 0 && arr[(i - 1) / 2].age > arr[i].age) {
-        swap(&arr[i], &arr[(i - 1) / 2]);
-        i = (i - 1) / 2;
-    }
-}
-
-// Function to delete the oldest person from the min-heap
-void deleteOldestPerson(struct person arr[], int *n) {
-    if (*n <= 0) {
-        printf("Heap is empty. Cannot delete.\n");
-        return;
-    }
-    if (*n == 1) {
-        (*n)--;
-        return;
+    FILE *fp = fopen("detail.dat", "r");
+    if (fp == NULL)
+    {
+        printf("Error opening file\n");
+        return 0;
     }
 
-    arr[0] = arr[*n - 1];
-    (*n)--;
-    minHeapify(arr, *n, 0);
-}
+    printf("MAIN MENU (HEAP)\n");
+    printf("1. Read Data\n");
+    printf("2. Create a Min-heap based on the age\n");
+    printf("3. Create a Max-heap based on the weight\n");
+    printf("4. Display weight of the youngest person\n");
+    printf("5. Insert a new person into the Min-heap\n");
+    printf("6. Delete the oldest person\n");
+    printf("7. Exit\n");
 
-int main() {
-    int option, n = 0;
-    struct person *people = NULL;
-    FILE *file = NULL;
+    int n = 7;
+    struct person s[n];
+    int num = 0;
 
-    do {
-        printf("\nMAIN MENU (HEAP)\n");
-        printf("1. Read Data\n");
-        printf("2. Create a Min-heap based on the age\n");
-        printf("3. Create a Max-heap based on the weight\n");
-        printf("4. Display weight of the youngest person\n");
-        printf("5. Insert a new person into the Min-heap\n");
-        printf("6. Delete the oldest person\n");
-        printf("7. Exit\n");
+    while (fgets(line, sizeof(line), fp) && num < n)
+    {
+        sscanf(line, "%d, %[^,], %d, %d, %d\n", &s[num].id, s[num].name, &s[num].age, &s[num].height, &s[num].weight);
+        num++;
+    }
+    int again = 1;
+    while (again)
+    {
+        int option;
         printf("Enter option: ");
         scanf("%d", &option);
 
-        switch (option) {
-            case 1:
-                if (file != NULL) {
-                    fclose(file);
-                    free(people);
-                }
+        switch (option)
+        {
+        case 1:
+        {
 
-                file = fopen("data.txt", "r");
-                if (file == NULL) {
-                    printf("Error: Unable to open the file.\n");
+            printf("Data read successfully\n");
+            printf("ID\tName\t\tAge\tHeight\tWeight\n");
+            for (int i = 0; i < n; i++)
+            {
+                printf("%d\t%s\t%d\t%d\t%d\n", s[i].id, s[i].name, s[i].age, s[i].height, s[i].weight);
+            }
+            printf("\nChoose option again? (0/1): ");
+            scanf("%d", &again);
+            break;
+        }
+        case 2:
+        {
+            int i = 1;
+            while (i < n)
+            {
+                int child = i;
+                while (child > 0)
+                {
+                    int parent = (child - 1) / 2;
+                    if (s[parent].age > s[child].age)
+                    {
+                        struct person temp = s[parent];
+                        s[parent] = s[child];
+                        s[child] = temp;
+                        child = parent;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                i++;
+            }
+            printf("Min-heap created successfully\n");
+            printf("ID\tName\t\tAge\tHeight\tWeight\n");
+            for (int i = 0; i < n; i++)
+            {
+                printf("%d\t%s\t%d\t%d\t%d\n", s[i].id, s[i].name, s[i].age, s[i].height, s[i].weight);
+            }
+            printf("\nChoose option again? (0/1): ");
+            scanf("%d", &again);
+            break;
+        }
+        case 3:
+        {
+            int i = 1;
+            while (i < n)
+            {
+                int child = i;
+                while (child > 0)
+                {
+                    int parent = (child - 1) / 2;
+                    if (s[parent].weight < s[child].weight)
+                    {
+                        struct person temp = s[parent];
+                        s[parent] = s[child];
+                        s[child] = temp;
+                        child = parent;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                i++;
+            }
+            printf("Max-heap created successfully\n");
+            printf("ID\tName\t\tAge\tHeight\tWeight\n");
+            for (int i = 0; i < n; i++)
+            {
+                printf("%d\t%s\t%d\t%d\t%d\n", s[i].id, s[i].name, s[i].age, s[i].height, s[i].weight);
+            }
+            printf("\nChoose option again? (0/1): ");
+            scanf("%d", &again);
+            break;
+        }
+        case 4:
+        {
+            int min = s[0].age;
+            int index = 0;
+            for (int i = 1; i < n; i++)
+            {
+                if (s[i].age < min)
+                {
+                    min = s[i].age;
+                    index = i;
+                }
+            }
+            printf("Weight of the age: %d\t youngest person: %d\n", s[index].age, s[index].weight);
+            printf("\nChoose option again? (0/1): ");
+            scanf("%d", &again);
+            break;
+        }
+        case 5:
+        {
+            printf("Enter new person details: ");
+            printf("Enter id: ");
+            scanf("%d", &s[n].id);
+            printf("Enter name: ");
+            scanf("%s", s[n].name);
+            printf("Enter age: ");
+            scanf("%d", &s[n].age);
+            printf("Enter height: ");
+            scanf("%d", &s[n].height);
+            printf("Enter weight: ");
+            scanf("%d", &s[n].weight);
+
+            int child = n;
+            while (child > 0)
+            {
+                int parent = (child - 1) / 2;
+                if (s[parent].age > s[child].age)
+                {
+                    struct person temp = s[parent];
+                    s[parent] = s[child];
+                    s[child] = temp;
+                    child = parent;
+                }
+                else
+                {
                     break;
                 }
-
-                fscanf(file, "%d", &n);
-                people = (struct person *)malloc(n * sizeof(struct person));
-
-                for (int i = 0; i < n; i++) {
-                    people[i].id = i;
-                    fscanf(file, "%s %d %d %d", people[i].name, &people[i].age, &people[i].height, &people[i].weight);
-                }
-                fclose(file);
-                printf("Data loaded successfully.\n");
-                break;
-
-            case 2:
-                if (n > 0) {
-                    buildMinHeap(people, n);
-                    printf("Min-heap based on age created.\n");
-                } else {
-                    printf("No data to create a heap.\n");
-                }
-                break;
-
-            case 3:
-                if (n > 0) {
-                    for (int i = 0; i < n; i++)
-                        people[i].weight *= -1;
-                    buildMinHeap(people, n);
-                    for (int i = 0; i < n; i++)
-                        people[i].weight *= -1;
-                    printf("Max-heap based on weight created.\n");
-                } else {
-                    printf("No data to create a heap.\n");
-                }
-                break;
-
-            case 4:
-                displayYoungestWeight(people, n);
-                break;
-
-            case 5:
-                if (n >= 100) {
-                    printf("Heap is full. Cannot insert more persons.\n");
-                } else {
-                    struct person newPerson;
-                    printf("Enter the details of the new person:\n");
-                    newPerson.id = n;
-                    scanf("%s %d %d %d", newPerson.name, &newPerson.age, &newPerson.height, &newPerson.weight);
-                    insertIntoMinHeap(people, &n, newPerson);
-                    printf("New person inserted into the Min-heap.\n");
-                }
-                break;
-
-            case 6:
-                deleteOldestPerson(people, &n);
-                printf("Oldest person deleted from the Min-heap.\n");
-                break;
-
-            case 7:
-               
-                if (file != NULL)
-                    fclose(file);
-                free(people);
-                printf("Exiting program.\n");
-                return 0;
-
-            default:
-                printf("Invalid Option, try again later.")
+            }
+            n++;
+            printf("New person inserted successfully\n");
+           
+            printf("\nChoose option again? (0/1): ");
+            scanf("%d", &again);
+            break;
         }
-    } while (1);
-
-    return 0;
+        case 6:
+        {
+            int max = s[0].age;
+            int index = 0;
+            for (int i = 1; i < n; i++)
+            {
+                if (s[i].age > max)
+                {
+                    max = s[i].age;
+                    index = i;
+                }
+            }
+            for (int i = index; i < n - 1; i++)
+            {
+                s[i] = s[i + 1];
+            }
+            n--;
+            printf("Oldest person deleted successfully\n");
+            printf("ID\tName\t\tAge\tHeight\tWeight\n");
+            for (int i = 0; i < n; i++)
+            {
+                printf("%d\t%s\t%d\t%d\t%d\n", s[i].id, s[i].name, s[i].age, s[i].height, s[i].weight);
+            }
+            printf("\nChoose option again? (0/1): ");
+            scanf("%d", &again);
+            break;
+        }
+        case 7:
+        {
+            again = 0;
+            break;
+        }
+        }
+    }
 }
